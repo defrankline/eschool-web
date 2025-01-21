@@ -1,15 +1,15 @@
-import React, { useState, useContext } from 'react';
+import React, {useContext, useState} from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { login } from '../api/auth';
+import {useNavigate} from 'react-router-dom';
+import {AuthContext} from '../context/AuthContext';
+import {login} from '../api/auth';
 
 const LoginForm: React.FC = () => {
     const authContext = useContext(AuthContext);
     if (!authContext) throw new Error('AuthContext must be used within AuthProvider');
 
-    const { login: handleLogin } = authContext;
+    const {login: handleLogin} = authContext;
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
@@ -28,9 +28,12 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={submitHandler}>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            <div className="mb-4">
+        <form onSubmit={submitHandler} className="space-y-6">
+            {error && <p className="text-red-500">{error}</p>}
+
+            {/* Inputs Container */}
+            <div className="flex flex-col md:flex-row gap-4">
+                {/* Email Input */}
                 <TextField
                     label="Email"
                     variant="outlined"
@@ -38,8 +41,8 @@ const LoginForm: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-            </div>
-            <div className="mb-4">
+
+                {/* Password Input */}
                 <TextField
                     label="Password"
                     type="password"
@@ -49,12 +52,14 @@ const LoginForm: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
+
+            {/* Submit Button */}
             <Button
                 type="submit"
                 variant="contained"
                 color="primary"
                 fullWidth
-                className="!mt-2"
+                className="!mt-4"
             >
                 Login
             </Button>

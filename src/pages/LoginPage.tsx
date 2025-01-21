@@ -2,21 +2,32 @@ import React from 'react';
 import LoginForm from '../components/LoginForm';
 // @ts-ignore
 import logo from '../assets/logo-school.png';
+import {Box} from '@mui/material';
 
 const LoginPage: React.FC = () => {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            {/* Card Container */}
-            <div className="w-72 bg-white p-8 shadow-lg rounded-md">
+        <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="100vh"
+            className="bg-gray-100"
+        >
+            {/* Login Card */}
+            <div className="w-52 bg-white p-6 shadow-lg rounded-md">
                 {/* Logo */}
-                <div className="flex justify-center mb-6">
-                    <img src={logo} alt="Logo" className="w-20 h-20 object-contain"/>
+                <div className="flex justify-center mb-4">
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="w-10 h-10 object-contain"
+                    />
                 </div>
                 {/* Login Form */}
-                <h1 className="text-xl font-bold text-center mb-4">Login</h1>
+                <h1 className="text-lg font-bold text-center mb-3">Login</h1>
                 <LoginForm/>
                 {/* Forgot Password Link */}
-                <div className="mt-4 text-center">
+                <div className="mt-3 text-center">
                     <a
                         href="/forgot-password"
                         className="text-blue-500 hover:underline text-sm"
@@ -25,7 +36,7 @@ const LoginPage: React.FC = () => {
                     </a>
                 </div>
             </div>
-        </div>
+        </Box>
     );
 };
 
