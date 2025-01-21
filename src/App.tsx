@@ -3,9 +3,10 @@ import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom
 import {AuthProvider} from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import ProtectedRoute from './components/ProtectedRoute';
 import AcademicYearList from './pages/AcademicYearList';
 import AcademicYearForm from './pages/AcademicYearForm';
+import ProtectedRoute from './components/ProtectedRoute';
+import MainLayout from './components/MainLayout';
 
 const App: React.FC = () => {
     return (
@@ -20,35 +21,18 @@ const App: React.FC = () => {
                         path="/dashboard"
                         element={
                             <ProtectedRoute>
-                                <DashboardPage/>
+                                <MainLayout/>
                             </ProtectedRoute>
                         }
-                    />
-
-                    <Route
-                        path="/dashboard/academic-years"
-                        element={
-                            <ProtectedRoute>
-                                <AcademicYearList/>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/dashboard/academic-years/new"
-                        element={
-                            <ProtectedRoute>
-                                <AcademicYearForm onSuccess={() => window.location.href = '/dashboard/academic-years'}/>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/dashboard/academic-years/:id/edit"
-                        element={
-                            <ProtectedRoute>
-                                <AcademicYearForm onSuccess={() => window.location.href = '/dashboard/academic-years'}/>
-                            </ProtectedRoute>
-                        }
-                    />
+                    >
+                        {/* Child Routes under MainLayout */}
+                        <Route index element={<DashboardPage/>}/>
+                        <Route path="academic-years" element={<AcademicYearList/>}/>
+                        <Route path="academic-years/new" element={<AcademicYearForm
+                            onSuccess={() => window.location.href = '/dashboard/academic-years'}/>}/>
+                        <Route path="academic-years/:id/edit" element={<AcademicYearForm
+                            onSuccess={() => window.location.href = '/dashboard/academic-years'}/>}/>
+                    </Route>
 
                     {/* Fallback Route */}
                     <Route path="*" element={<Navigate to="/login"/>}/>

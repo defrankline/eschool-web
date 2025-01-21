@@ -8,20 +8,20 @@ export interface AcademicYear {
 }
 
 export const getAcademicYears = async (): Promise<AcademicYear[]> => {
-    const response = await axiosInstance.get('/api/academic-years');
+    const response = await axiosInstance.get('/academic-years');
     return response.data;
 };
 
 export const createAcademicYear = async (academicYear: Omit<AcademicYear, 'id'>): Promise<AcademicYear> => {
-    const response = await axiosInstance.post('/api/academic-years', academicYear);
+    const response = await axiosInstance.post('/academic-years', academicYear);
     return response.data;
 };
 
 export const updateAcademicYear = async (id: number, academicYear: Omit<AcademicYear, 'id'>): Promise<AcademicYear> => {
-    const response = await axiosInstance.put(`/api/academic-years/${id}`, academicYear);
+    const response = await axiosInstance.put(`/academic-years/${id}`, academicYear);
     return response.data;
 };
 
 export const deleteAcademicYear = async (id: number): Promise<void> => {
-    await axiosInstance.delete(`/api/academic-years/${id}`);
+    await axiosInstance.delete(`/academic-years/${id}`);
 };
