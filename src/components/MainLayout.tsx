@@ -1,9 +1,10 @@
 import React from 'react';
-import {AppBar, Box, Button, Menu, MenuItem, Toolbar, Typography} from '@mui/material';
+import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography,} from '@mui/material';
 import {Outlet, useNavigate} from 'react-router-dom';
 
 const MainLayout: React.FC = () => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null); // Menu for horizontal menus
+    const [profileAnchorEl, setProfileAnchorEl] = React.useState<null | HTMLElement>(null); // Menu for profile
     const [submenu, setSubmenu] = React.useState<string | null>(null);
     const navigate = useNavigate();
 
@@ -17,9 +18,18 @@ const MainLayout: React.FC = () => {
         setSubmenu(null);
     };
 
-    const handleSubmenuClick = (path: string) => {
-        navigate(path);
-        handleMenuClose();
+    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setProfileAnchorEl(event.currentTarget);
+    };
+
+    const handleProfileMenuClose = () => {
+        setProfileAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
     };
 
     return (
@@ -27,12 +37,13 @@ const MainLayout: React.FC = () => {
             {/* Header */}
             <AppBar position="static" className="bg-blue-600">
                 <Toolbar className="flex items-center justify-between">
-                    <Typography variant="h6" className="font-bold">
+                    {/* App Title */}
+                    <Typography variant="h6" className="font-bold text-white">
                         School Management System
                     </Typography>
 
                     {/* Horizontal Menus */}
-                    <Box className="flex space-x-6">
+                    <Box className="flex items-center space-x-6">
                         <Button color="inherit" onClick={(e) => handleMenuClick(e, 'students')}>
                             Students
                         </Button>
@@ -48,6 +59,11 @@ const MainLayout: React.FC = () => {
                         <Button color="inherit" onClick={(e) => handleMenuClick(e, 'setup')}>
                             Setup
                         </Button>
+
+                        {/* Profile Avatar */}
+                        <IconButton onClick={handleProfileMenuOpen}>
+                            <Avatar alt="User Profile" src="/path-to-profile-photo.jpg"/>
+                        </IconButton>
                     </Box>
                 </Toolbar>
             </AppBar>
@@ -86,11 +102,23 @@ const MainLayout: React.FC = () => {
                 )}
                 {submenu === 'setup' && (
                     <>
-                        <MenuItem onClick={() => handleSubmenuClick('/dashboard/academic-years')}>
+                        <MenuItem onClick={() => navigate('/dashboard/academic-years')}>
                             Academic Years
                         </MenuItem>
                     </>
                 )}
+            </Menu>
+
+            {/* Profile Menu */}
+            <Menu
+                anchorEl={profileAnchorEl}
+                open={Boolean(profileAnchorEl)}
+                onClose={handleProfileMenuClose}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                transformOrigin={{vertical: 'top', horizontal: 'right'}}
+            >
+                <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
 
             {/* Main Content */}

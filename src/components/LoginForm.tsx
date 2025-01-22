@@ -1,6 +1,5 @@
 import React, {useContext, useState} from 'react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import {Box, Button, TextField, Typography} from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import {AuthContext} from '../context/AuthContext';
 import {login} from '../api/auth';
@@ -28,11 +27,15 @@ const LoginForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={submitHandler} className="space-y-6">
-            {error && <p className="text-red-500">{error}</p>}
+        <form onSubmit={submitHandler}>
+            <Box display="flex" flexDirection="column" gap={3}>
+                {/* Error Message */}
+                {error && (
+                    <Typography color="error" textAlign="center">
+                        {error}
+                    </Typography>
+                )}
 
-            {/* Inputs Container */}
-            <div className="flex flex-col md:flex-row gap-4">
                 {/* Email Input */}
                 <TextField
                     label="Email"
@@ -51,18 +54,17 @@ const LoginForm: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-            </div>
 
-            {/* Submit Button */}
-            <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                className="!mt-4"
-            >
-                Login
-            </Button>
+                {/* Submit Button */}
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                >
+                    Login
+                </Button>
+            </Box>
         </form>
     );
 };

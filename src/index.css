@@ -7,52 +7,26 @@
 /* Tailwind CSS Utility Styles */
 @tailwind utilities;
 
+/* Global Styles */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-
-/* Reset Styles for Consistency */
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif; /* Optional: Replace with your preferred font */
-    background-color: #f5f5f5; /* Light gray background for a subtle look */
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f5f5; /* Optional: Light gray background */
     color: #333; /* Default text color */
 }
 
 h1, h2, h3, h4, h5, h6 {
     margin: 0;
     font-weight: bold;
-    color: #111; /* Darker heading color for contrast */
-}
-
-p {
-    margin: 0;
-    line-height: 1.6; /* Improve readability */
+    color: #111; /* Darker heading color */
 }
 
 button {
-    all: unset; /* Remove default button styles */
+    all: unset; /* Reset button styles */
     cursor: pointer;
 }
-
-a {
-    text-decoration: none;
-    color: inherit; /* Inherit text color for links */
-}
-
-/* Make the progress bar more prominent */
-.animate-pulse {
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
