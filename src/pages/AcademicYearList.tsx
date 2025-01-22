@@ -9,7 +9,6 @@ import {
     Fab,
     FormControl,
     FormControlLabel,
-    IconButton,
     InputAdornment,
     InputLabel,
     MenuItem,
@@ -25,8 +24,6 @@ import {
     TableRow,
     Typography,
 } from '@mui/material';
-
-import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 import {useFormik} from 'formik';
@@ -38,8 +35,8 @@ import {
     getAcademicYears,
     updateAcademicYear,
 } from '../api/academicYear';
-import {Edit} from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
+import ActionsMenu from "../components/ActionsMenu.tsx";
 
 const AcademicYearList: React.FC = () => {
     const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
@@ -244,12 +241,11 @@ const AcademicYearList: React.FC = () => {
                                 </TableCell>
                                 <TableCell>{year.previous?.name}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => handleOpenDeleteDialog(year.id)} color="error">
-                                        <DeleteIcon/>
-                                    </IconButton>
-                                    <Button color="primary" onClick={() => handleOpenFormDialog(year)}>
-                                        <Edit/>
-                                    </Button>
+                                    <ActionsMenu
+                                        year={year}
+                                        onEdit={handleOpenFormDialog}
+                                        onDelete={handleOpenDeleteDialog}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
