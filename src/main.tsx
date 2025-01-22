@@ -6,7 +6,8 @@ import {CssBaseline} from '@mui/material';
 import {LoadingContext, LoadingProvider} from './context/LoadingContext';
 import GlobalProgressBar from './components/GlobalProgressBar'; // Or GlobalSpinner
 import {initAxiosInterceptors} from './api/axiosInstance';
-import './index.css'; // Import Tailwind and global styles
+import './index.css';
+import {ToastProvider} from "./context/ToastProvider.tsx"; // Import Tailwind and global styles
 
 // Create Material-UI theme
 const theme = createTheme({
@@ -51,7 +52,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 
                 {/* Display the global loading indicator */}
                 <GlobalProgressBar/> {/* Or GlobalSpinner */}
-                <App/>
+                <ToastProvider>
+                    <App/>
+                </ToastProvider>
             </LoadingProvider>
         </ThemeProvider>
     </React.StrictMode>

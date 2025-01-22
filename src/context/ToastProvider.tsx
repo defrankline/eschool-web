@@ -5,6 +5,8 @@ type ToastContextType = {
     showToast: (message: string, severity: AlertColor) => void;
 };
 
+let externalShowToast: (message: string, severity: AlertColor) => void; // External toast function
+
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({children}) => {
@@ -22,6 +24,9 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({children}) => 
         setOpen(false);
     };
 
+    // Assign the internal showToast function to the global one
+    externalShowToast = showToast;
+
     return (
         <ToastContext.Provider value={{showToast}}>
             {children}
@@ -29,7 +34,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({children}) => 
                 open={open}
                 autoHideDuration={5000}
                 onClose={handleClose}
-                anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
             >
                 <Alert onClose={handleClose} severity={severity} variant="filled">
                     {message}
@@ -37,6 +42,13 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({children}) => 
             </Snackbar>
         </ToastContext.Provider>
     );
+};
+
+// Expose a global function to trigger toasts
+export const toast = (message: string, severity: AlertColor) => {
+    if (externalShowToast) {
+        externalShowToast(message, severity);
+    }
 };
 
 export const useToast = () => {
