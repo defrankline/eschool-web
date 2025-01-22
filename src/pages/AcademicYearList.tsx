@@ -72,8 +72,8 @@ const AcademicYearList: React.FC = () => {
         fetchAcademicYears();
     }, [page, rowsPerPage, filter]);
 
-    const handleOpenDeleteDialog = (id: number) => {
-        setSelectedId(id);
+    const handleOpenDeleteDialog = (year: AcademicYear) => {
+        setSelectedId(year.id);
         setOpenDialog(true);
     };
 
@@ -166,7 +166,7 @@ const AcademicYearList: React.FC = () => {
             );
             setAcademicYears(updatedYears);
 
-            // Optionally, update the backend
+            // Update the backend
             const yearToUpdate = updatedYears.find((year) => year.id === id);
             if (yearToUpdate) {
                 await updateAcademicYear(id, yearToUpdate);
@@ -242,9 +242,9 @@ const AcademicYearList: React.FC = () => {
                                 <TableCell>{year.previous?.name}</TableCell>
                                 <TableCell>
                                     <ActionsMenu
-                                        year={year}
-                                        onEdit={handleOpenFormDialog}
-                                        onDelete={handleOpenDeleteDialog}
+                                        entity={year}
+                                        onEdit={(entity) => handleOpenFormDialog(entity)}
+                                        onDelete={(entity) => handleOpenDeleteDialog(entity)}
                                     />
                                 </TableCell>
                             </TableRow>

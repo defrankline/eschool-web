@@ -1,19 +1,24 @@
 import React, {useState} from 'react';
-import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem,} from '@mui/material';
+import {IconButton, ListItemIcon, ListItemText, Menu, MenuItem} from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {AcademicYear} from "../api/academicYear.ts";
 
-const ActionsMenu: React.FC<{
-    year: AcademicYear;
-    onEdit: (year: AcademicYear) => void;
-    onDelete: (id: number) => void
-}> = ({
-          year,
-          onEdit,
-          onDelete,
-      }) => {
+interface EntityWithId {
+    id: number | string; // Define that entities must have an `id`
+}
+
+interface ActionsMenuProps<T extends EntityWithId> {
+    entity: T; // Generic entity
+    onEdit: (entity: T) => void; // Edit callback with the full entity
+    onDelete: (entity: T) => void; // Delete callback with the entity ID
+}
+
+const ActionsMenu = <T extends EntityWithId>({
+                                                 entity,
+                                                 onEdit,
+                                                 onDelete,
+                                             }: ActionsMenuProps<T>): JSX.Element => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -48,7 +53,7 @@ const ActionsMenu: React.FC<{
                 {/* Edit Option */}
                 <MenuItem
                     onClick={() => {
-                        onEdit(year);
+                        onEdit(entity);
                         handleCloseMenu();
                     }}
                 >
@@ -59,11 +64,11 @@ const ActionsMenu: React.FC<{
                 </MenuItem>
 
                 {/* Delete Option */}
-                <MenuItem color={'warn'}
-                          onClick={() => {
-                              onDelete(year.id);
-                              handleCloseMenu();
-                          }}
+                <MenuItem
+                    onClick={() => {
+                        onDelete(entity);
+                        handleCloseMenu();
+                    }}
                 >
                     <ListItemIcon>
                         <DeleteIcon fontSize="small"/>

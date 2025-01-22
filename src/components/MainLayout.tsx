@@ -38,7 +38,7 @@ const MainLayout: React.FC = () => {
             <AppBar position="static" className="bg-blue-600">
                 <Toolbar className="flex items-center justify-between">
                     {/* App Title */}
-                    <Typography variant="h6" className="font-bold text-white">
+                    <Typography variant="h5" className="font-bold text-white">
                         School Management System
                     </Typography>
 
