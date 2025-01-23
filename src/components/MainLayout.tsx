@@ -102,6 +102,12 @@ const MainLayout: React.FC = () => {
                 )}
                 {submenu === 'setup' && (
                     <>
+                        <MenuItem onClick={() => navigate('/dashboard/subjects')}>
+                            Subjects
+                        </MenuItem>
+                        <MenuItem onClick={() => navigate('/dashboard/departments')}>
+                            Departments
+                        </MenuItem>
                         <MenuItem onClick={() => navigate('/dashboard/academic-years')}>
                             Academic Years
                         </MenuItem>

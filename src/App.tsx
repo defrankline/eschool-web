@@ -3,20 +3,18 @@ import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom
 import {AuthProvider} from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import AcademicYearList from './pages/AcademicYearList';
-import AcademicYearForm from './pages/AcademicYearForm';
+import AcademicYearPage from './pages/AcademicYearPage.tsx';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
+import DepartmentPage from "./pages/DepartmentPage.tsx";
+import SubjectPage from "./pages/SubjectPage.tsx";
 
 const App: React.FC = () => {
     return (
         <AuthProvider>
             <Router>
                 <Routes>
-                    {/* Public Routes */}
                     <Route path="/login" element={<LoginPage/>}/>
-
-                    {/* Protected Routes */}
                     <Route
                         path="/dashboard"
                         element={
@@ -25,13 +23,10 @@ const App: React.FC = () => {
                             </ProtectedRoute>
                         }
                     >
-                        {/* Child Routes under MainLayout */}
                         <Route index element={<DashboardPage/>}/>
-                        <Route path="academic-years" element={<AcademicYearList/>}/>
-                        <Route path="academic-years/new" element={<AcademicYearForm
-                            onSuccess={() => window.location.href = '/dashboard/academic-years'}/>}/>
-                        <Route path="academic-years/:id/edit" element={<AcademicYearForm
-                            onSuccess={() => window.location.href = '/dashboard/academic-years'}/>}/>
+                        <Route path="academic-years" element={<AcademicYearPage/>}/>
+                        <Route path="departments" element={<DepartmentPage/>}/>
+                        <Route path="subjects" element={<SubjectPage/>}/>
                     </Route>
 
                     {/* Fallback Route */}

@@ -38,7 +38,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import ActionsMenu from "../components/ActionsMenu.tsx";
 
-const AcademicYearList: React.FC = () => {
+const AcademicYearPage: React.FC = () => {
     const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [page, setPage] = useState(0);
@@ -402,4 +402,4 @@ const AcademicYearList: React.FC = () => {
     );
 };
 
-export default AcademicYearList;
+export default AcademicYearPage;

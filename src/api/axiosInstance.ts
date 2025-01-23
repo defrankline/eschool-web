@@ -54,7 +54,6 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         if (setLoading) setLoading(false);
-
         // Handle error statuses
         if (error.response) {
             const {status, data} = error.response;
