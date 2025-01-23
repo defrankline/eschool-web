@@ -23,7 +23,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import {createGradeLevel, getGradeLevels, GradeLevel, updateGradeLevel,} from '../api/gradeLevel';
-import {createStream, deleteStream, getStreams, Stream, updateStream} from '../api/stream';
+import {createStream, deleteStream, getStreams, Stream, updateStream,} from '../api/stream';
 import ActionsMenu from '../components/ActionsMenu';
 
 const GradeLevelPage: React.FC = () => {
@@ -33,19 +33,21 @@ const GradeLevelPage: React.FC = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filter, setFilter] = useState('');
-    const [openDialog, setOpenDialog] = useState(false);
     const [openFormDialog, setOpenFormDialog] = useState(false);
     const [openStreamsDialog, setOpenStreamsDialog] = useState(false);
+    const [openStreamFormDialog, setOpenStreamFormDialog] = useState(false);
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [selectedGradeName, setSelectedGradeName] = useState<string | null>(null);
     const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
 
+    // Load Grade Levels
     const loadGradeLevels = async () => {
         const response = await getGradeLevels(page, rowsPerPage, filter);
         setGradeLevels(response.data);
         setTotalItems(response.totalItems);
     };
 
+    // Load Streams for Selected Grade Level
     const loadStreams = async (gradeLevelId: number) => {
         const response = await getStreams(gradeLevelId);
         setStreams(response.data);
@@ -58,7 +60,7 @@ const GradeLevelPage: React.FC = () => {
         fetchGradeLevels();
     }, [page, rowsPerPage, filter]);
 
-    // Stream dialog management
+    // Open Streams Dialog
     const handleOpenStreamsDialog = async (grade: GradeLevel) => {
         setSelectedId(grade.id);
         setSelectedGradeName(grade.name);
@@ -66,6 +68,7 @@ const GradeLevelPage: React.FC = () => {
         setOpenStreamsDialog(true);
     };
 
+    // Close Streams Dialog
     const handleCloseStreamsDialog = () => {
         setOpenStreamsDialog(false);
         setSelectedId(null);
@@ -73,24 +76,26 @@ const GradeLevelPage: React.FC = () => {
         setSelectedStream(null);
     };
 
-    // Grade CRUD dialog management
+    // Open Grade Form Dialog
     const handleOpenFormDialog = (grade: GradeLevel | null = null) => {
         if (grade) {
             setSelectedId(grade.id);
-            formik.setValues({name: grade.name});
+            gradeFormik.setValues({name: grade.name});
         } else {
             setSelectedId(null);
-            formik.resetForm();
+            gradeFormik.resetForm();
         }
         setOpenFormDialog(true);
     };
 
+    // Close Grade Form Dialog
     const handleCloseFormDialog = () => {
         setOpenFormDialog(false);
-        formik.resetForm();
+        gradeFormik.resetForm();
         setSelectedId(null);
     };
 
+    // Open Stream Form Dialog
     const handleOpenStreamForm = (stream: Stream | null = null) => {
         setSelectedStream(stream);
         streamFormik.setValues(
@@ -98,15 +103,18 @@ const GradeLevelPage: React.FC = () => {
                 ? {name: stream.name, gradeLevelId: stream.gradeLevelId}
                 : {name: '', gradeLevelId: selectedId!}
         );
+        setOpenStreamFormDialog(true);
     };
 
+    // Close Stream Form Dialog
     const handleCloseStreamForm = () => {
         setSelectedStream(null);
         streamFormik.resetForm();
+        setOpenStreamFormDialog(false);
     };
 
-    // Grade Formik configuration
-    const formik = useFormik({
+    // Formik for Grade Levels
+    const gradeFormik = useFormik({
         initialValues: {name: ''},
         validationSchema: Yup.object({
             name: Yup.string().required('Name is required'),
@@ -123,7 +131,7 @@ const GradeLevelPage: React.FC = () => {
         },
     });
 
-    // Stream Formik configuration
+    // Formik for Streams
     const streamFormik = useFormik({
         initialValues: {name: '', gradeLevelId: 0},
         validationSchema: Yup.object({
@@ -143,6 +151,7 @@ const GradeLevelPage: React.FC = () => {
 
     return (
         <div className="p-4">
+            {/* Grade Levels */}
             <div className="flex items-center justify-between mb-4">
                 <Typography variant="h5" component="h1" className="text-gray-400">
                     Grade Levels
@@ -212,7 +221,7 @@ const GradeLevelPage: React.FC = () => {
                 <DialogContent>
                     <div className="flex justify-between items-center mb-4">
                         <Typography variant="h6">Streams</Typography>
-                        <Button onClick={() => handleOpenStreamForm()} variant="contained" color="primary">
+                        <Button onClick={() => handleOpenStreamForm(null)} variant="contained" color="primary">
                             Add Stream
                         </Button>
                     </div>
@@ -252,8 +261,7 @@ const GradeLevelPage: React.FC = () => {
             </Dialog>
 
             {/* Add/Edit Stream Dialog */}
-            <Dialog open={!!selectedStream || streamFormik.values.name} onClose={handleCloseStreamForm} fullWidth
-                    maxWidth="sm">
+            <Dialog open={openStreamFormDialog} onClose={handleCloseStreamForm} fullWidth maxWidth="sm">
                 <DialogTitle>{selectedStream ? 'Edit Stream' : 'Add Stream'}</DialogTitle>
                 <form onSubmit={streamFormik.handleSubmit}>
                     <DialogContent>
@@ -283,18 +291,18 @@ const GradeLevelPage: React.FC = () => {
             {/* Add/Edit Grade Dialog */}
             <Dialog open={openFormDialog} onClose={handleCloseFormDialog} fullWidth maxWidth="sm">
                 <DialogTitle>{selectedId ? 'Edit Grade Level' : 'Add Grade Level'}</DialogTitle>
-                <form onSubmit={formik.handleSubmit}>
+                <form onSubmit={gradeFormik.handleSubmit}>
                     <DialogContent>
                         <TextField
                             label="Grade Name"
                             fullWidth
                             margin="normal"
                             name="name"
-                            value={formik.values.name}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.name && Boolean(formik.errors.name)}
-                            helperText={formik.touched.name && formik.errors.name}
+                            value={gradeFormik.values.name}
+                            onChange={gradeFormik.handleChange}
+                            onBlur={gradeFormik.handleBlur}
+                            error={gradeFormik.touched.name && Boolean(gradeFormik.errors.name)}
+                            helperText={gradeFormik.touched.name && gradeFormik.errors.name}
                         />
                     </DialogContent>
                     <DialogActions>
