@@ -36,6 +36,7 @@ const GradeLevelPage: React.FC = () => {
     const [openFormDialog, setOpenFormDialog] = useState(false);
     const [openStreamsDialog, setOpenStreamsDialog] = useState(false);
     const [openStreamFormDialog, setOpenStreamFormDialog] = useState(false);
+    const [openStreamDeleteDialog, setOpenStreamDeleteDialog] = useState(false); // New delete dialog state
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [selectedGradeName, setSelectedGradeName] = useState<string | null>(null);
     const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
@@ -111,6 +112,27 @@ const GradeLevelPage: React.FC = () => {
         setSelectedStream(null);
         streamFormik.resetForm();
         setOpenStreamFormDialog(false);
+    };
+
+    // Open Stream Delete Confirmation Dialog
+    const handleOpenStreamDeleteDialog = (stream: Stream) => {
+        setSelectedStream(stream);
+        setOpenStreamDeleteDialog(true);
+    };
+
+    // Close Stream Delete Confirmation Dialog
+    const handleCloseStreamDeleteDialog = () => {
+        setSelectedStream(null);
+        setOpenStreamDeleteDialog(false);
+    };
+
+    // Confirm Stream Deletion
+    const handleDeleteStream = async () => {
+        if (selectedStream) {
+            await deleteStream(selectedStream.id);
+            if (selectedId) await loadStreams(selectedId);
+            handleCloseStreamDeleteDialog();
+        }
     };
 
     // Formik for Grade Levels
@@ -241,10 +263,7 @@ const GradeLevelPage: React.FC = () => {
                                             <ActionsMenu
                                                 entity={stream}
                                                 onEdit={(entity) => handleOpenStreamForm(entity)}
-                                                onDelete={(entity) => {
-                                                    deleteStream(entity.id);
-                                                    loadStreams(selectedId!);
-                                                }}
+                                                onDelete={(entity) => handleOpenStreamDeleteDialog(entity)}
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -286,6 +305,22 @@ const GradeLevelPage: React.FC = () => {
                         </Button>
                     </DialogActions>
                 </form>
+            </Dialog>
+
+            {/* Stream Delete Confirmation Dialog */}
+            <Dialog open={openStreamDeleteDialog} onClose={handleCloseStreamDeleteDialog} fullWidth maxWidth="xs">
+                <DialogTitle>Confirm Stream Deletion</DialogTitle>
+                <DialogContent>
+                    <Typography>{`Are you sure you want to delete the stream "${selectedStream?.name}"?`}</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseStreamDeleteDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteStream} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
             </Dialog>
 
             {/* Add/Edit Grade Dialog */}
