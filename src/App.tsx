@@ -8,7 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import DepartmentPage from "./pages/DepartmentPage.tsx";
 import SubjectPage from "./pages/SubjectPage.tsx";
-import GradeLevelPage from "./pages/GradeLevelPage.tsx";
+import GradeLevelPage from "./pages/gradel-level/GradeLevelPage.tsx";
 
 const App: React.FC = () => {
     return (
