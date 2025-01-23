@@ -15,30 +15,40 @@ import {
     TableHead,
     TablePagination,
     TableRow,
+    TextField,
     Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import TextField from '@mui/material/TextField';
+import SearchIcon from '@mui/icons-material/Search';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {createGradeLevel, deleteGradeLevel, getGradeLevels, GradeLevel, updateGradeLevel,} from '../api/gradeLevel.ts';
-import SearchIcon from '@mui/icons-material/Search';
-import ActionsMenu from "../components/ActionsMenu.tsx";
+import {createGradeLevel, getGradeLevels, GradeLevel, updateGradeLevel,} from '../api/gradeLevel';
+import {createStream, deleteStream, getStreams, Stream, updateStream} from '../api/stream';
+import ActionsMenu from '../components/ActionsMenu';
 
 const GradeLevelPage: React.FC = () => {
     const [gradeLevels, setGradeLevels] = useState<GradeLevel[]>([]);
+    const [streams, setStreams] = useState<Stream[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filter, setFilter] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
     const [openFormDialog, setOpenFormDialog] = useState(false);
+    const [openStreamsDialog, setOpenStreamsDialog] = useState(false);
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [selectedGradeName, setSelectedGradeName] = useState<string | null>(null);
+    const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
 
     const loadGradeLevels = async () => {
         const response = await getGradeLevels(page, rowsPerPage, filter);
         setGradeLevels(response.data);
         setTotalItems(response.totalItems);
+    };
+
+    const loadStreams = async (gradeLevelId: number) => {
+        const response = await getStreams(gradeLevelId);
+        setStreams(response.data);
     };
 
     useEffect(() => {
@@ -48,30 +58,26 @@ const GradeLevelPage: React.FC = () => {
         fetchGradeLevels();
     }, [page, rowsPerPage, filter]);
 
-    const handleOpenDeleteDialog = (year: GradeLevel) => {
-        setSelectedId(year.id);
-        setOpenDialog(true);
+    // Stream dialog management
+    const handleOpenStreamsDialog = async (grade: GradeLevel) => {
+        setSelectedId(grade.id);
+        setSelectedGradeName(grade.name);
+        await loadStreams(grade.id);
+        setOpenStreamsDialog(true);
     };
 
-    const handleCloseDeleteDialog = () => {
-        setOpenDialog(false);
+    const handleCloseStreamsDialog = () => {
+        setOpenStreamsDialog(false);
         setSelectedId(null);
+        setSelectedGradeName(null);
+        setSelectedStream(null);
     };
 
-    const handleDeleteConfirm = async () => {
-        if (selectedId !== null) {
-            await deleteGradeLevel(selectedId);
-            setGradeLevels((prev) => prev.filter((year) => year.id !== selectedId));
-            handleCloseDeleteDialog();
-        }
-    };
-
-    const handleOpenFormDialog = (year: GradeLevel | null = null) => {
-        if (year) {
-            setSelectedId(year.id);
-            formik.setValues({
-                name: year.name,
-            });
+    // Grade CRUD dialog management
+    const handleOpenFormDialog = (grade: GradeLevel | null = null) => {
+        if (grade) {
+            setSelectedId(grade.id);
+            formik.setValues({name: grade.name});
         } else {
             setSelectedId(null);
             formik.resetForm();
@@ -85,12 +91,25 @@ const GradeLevelPage: React.FC = () => {
         setSelectedId(null);
     };
 
+    const handleOpenStreamForm = (stream: Stream | null = null) => {
+        setSelectedStream(stream);
+        streamFormik.setValues(
+            stream
+                ? {name: stream.name, gradeLevelId: stream.gradeLevelId}
+                : {name: '', gradeLevelId: selectedId!}
+        );
+    };
+
+    const handleCloseStreamForm = () => {
+        setSelectedStream(null);
+        streamFormik.resetForm();
+    };
+
+    // Grade Formik configuration
     const formik = useFormik({
-        initialValues: {
-            name: ''
-        },
+        initialValues: {name: ''},
         validationSchema: Yup.object({
-            name: Yup.string().required('Name is required')
+            name: Yup.string().required('Name is required'),
         }),
         onSubmit: async (values) => {
             const payload = {...values, ...(selectedId && {id: selectedId})} as GradeLevel;
@@ -100,11 +119,27 @@ const GradeLevelPage: React.FC = () => {
                 await createGradeLevel(payload);
             }
             await loadGradeLevels();
-
             handleCloseFormDialog();
         },
     });
 
+    // Stream Formik configuration
+    const streamFormik = useFormik({
+        initialValues: {name: '', gradeLevelId: 0},
+        validationSchema: Yup.object({
+            name: Yup.string().required('Stream name is required'),
+        }),
+        onSubmit: async (values) => {
+            const payload = {...values, ...(selectedStream && {id: selectedStream.id})} as Stream;
+            if (selectedStream) {
+                await updateStream(payload.id, payload);
+            } else {
+                await createStream(payload);
+            }
+            if (selectedId) await loadStreams(selectedId);
+            handleCloseStreamForm();
+        },
+    });
 
     return (
         <div className="p-4">
@@ -140,14 +175,18 @@ const GradeLevelPage: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {gradeLevels.map((year) => (
-                            <TableRow key={year.id}>
-                                <TableCell>{year.name}</TableCell>
+                        {gradeLevels.map((grade) => (
+                            <TableRow key={grade.id}>
+                                <TableCell>
+                                    <Button onClick={() => handleOpenStreamsDialog(grade)} color="primary">
+                                        {grade.name}
+                                    </Button>
+                                </TableCell>
                                 <TableCell>
                                     <ActionsMenu
-                                        entity={year}
+                                        entity={grade}
                                         onEdit={(entity) => handleOpenFormDialog(entity)}
-                                        onDelete={(entity) => handleOpenDeleteDialog(entity)}
+                                        onDelete={(entity) => console.log(`Delete ${entity.id}`)}
                                     />
                                 </TableCell>
                             </TableRow>
@@ -158,8 +197,6 @@ const GradeLevelPage: React.FC = () => {
                     component="div"
                     count={totalItems}
                     page={page}
-                    showFirstButton={true}
-                    showLastButton={true}
                     rowsPerPage={rowsPerPage}
                     onPageChange={(_event, newPage) => setPage(newPage)}
                     onRowsPerPageChange={(event) => {
@@ -169,29 +206,87 @@ const GradeLevelPage: React.FC = () => {
                 />
             </TableContainer>
 
-            {/* Delete Confirmation Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDeleteDialog}>
-                <DialogTitle>Confirm Deletion</DialogTitle>
+            {/* Streams Dialog */}
+            <Dialog open={openStreamsDialog} onClose={handleCloseStreamsDialog} fullWidth maxWidth="md">
+                <DialogTitle>{`Streams for ${selectedGradeName}`}</DialogTitle>
                 <DialogContent>
-                    <Typography>Are you sure you want to delete this grade level?</Typography>
+                    <div className="flex justify-between items-center mb-4">
+                        <Typography variant="h6">Streams</Typography>
+                        <Button onClick={() => handleOpenStreamForm()} variant="contained" color="primary">
+                            Add Stream
+                        </Button>
+                    </div>
+                    <TableContainer component={Paper}>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><strong>Name</strong></TableCell>
+                                    <TableCell><strong>Actions</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {streams.map((stream) => (
+                                    <TableRow key={stream.id}>
+                                        <TableCell>{stream.name}</TableCell>
+                                        <TableCell>
+                                            <ActionsMenu
+                                                entity={stream}
+                                                onEdit={(entity) => handleOpenStreamForm(entity)}
+                                                onDelete={(entity) => {
+                                                    deleteStream(entity.id);
+                                                    loadStreams(selectedId!);
+                                                }}
+                                            />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDeleteDialog} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleDeleteConfirm} color="error">
-                        Delete
+                    <Button onClick={handleCloseStreamsDialog} color="primary">
+                        Close
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Add/Edit Form Dialog */}
+            {/* Add/Edit Stream Dialog */}
+            <Dialog open={!!selectedStream || streamFormik.values.name} onClose={handleCloseStreamForm} fullWidth
+                    maxWidth="sm">
+                <DialogTitle>{selectedStream ? 'Edit Stream' : 'Add Stream'}</DialogTitle>
+                <form onSubmit={streamFormik.handleSubmit}>
+                    <DialogContent>
+                        <TextField
+                            label="Stream Name"
+                            fullWidth
+                            margin="normal"
+                            name="name"
+                            value={streamFormik.values.name}
+                            onChange={streamFormik.handleChange}
+                            onBlur={streamFormik.handleBlur}
+                            error={streamFormik.touched.name && Boolean(streamFormik.errors.name)}
+                            helperText={streamFormik.touched.name && streamFormik.errors.name}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseStreamForm} color="primary">
+                            Cancel
+                        </Button>
+                        <Button type="submit" color="primary">
+                            {selectedStream ? 'Update' : 'Add'}
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+
+            {/* Add/Edit Grade Dialog */}
             <Dialog open={openFormDialog} onClose={handleCloseFormDialog} fullWidth maxWidth="sm">
                 <DialogTitle>{selectedId ? 'Edit Grade Level' : 'Add Grade Level'}</DialogTitle>
                 <form onSubmit={formik.handleSubmit}>
                     <DialogContent>
                         <TextField
-                            label="Name"
+                            label="Grade Name"
                             fullWidth
                             margin="normal"
                             name="name"
