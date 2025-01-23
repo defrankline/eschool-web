@@ -105,6 +105,9 @@ const MainLayout: React.FC = () => {
                         <MenuItem onClick={() => navigate('/dashboard/subjects')}>
                             Subjects
                         </MenuItem>
+                        <MenuItem onClick={() => navigate('/dashboard/grade-levels')}>
+                            Grade Levels
+                        </MenuItem>
                         <MenuItem onClick={() => navigate('/dashboard/departments')}>
                             Departments
                         </MenuItem>

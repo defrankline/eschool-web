@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 import DepartmentPage from "./pages/DepartmentPage.tsx";
 import SubjectPage from "./pages/SubjectPage.tsx";
+import GradeLevelPage from "./pages/GradeLevelPage.tsx";
 
 const App: React.FC = () => {
     return (
@@ -27,6 +28,7 @@ const App: React.FC = () => {
                         <Route path="academic-years" element={<AcademicYearPage/>}/>
                         <Route path="departments" element={<DepartmentPage/>}/>
                         <Route path="subjects" element={<SubjectPage/>}/>
+                        <Route path="grade-levels" element={<GradeLevelPage/>}/>
                     </Route>
 
                     {/* Fallback Route */}
