@@ -38,9 +38,16 @@ const MainLayout: React.FC = () => {
             <AppBar position="static" className="bg-blue-600">
                 <Toolbar className="flex items-center justify-between">
                     {/* App Title */}
-                    <Typography variant="h5" className="font-bold text-white">
-                        School Management System
-                    </Typography>
+                    <div className="flex items-center space-x-4">
+                        <img
+                            src="/ilboru.png"
+                            alt="Ilboru Secondary School Logo"
+                            className="rounded-full w-10 h-10 object-cover"
+                        />
+                        <Typography variant="h5" className="font-bold text-white">
+                            Ilboru Secondary School
+                        </Typography>
+                    </div>
 
                     {/* Horizontal Menus */}
                     <Box className="flex items-center space-x-6">
