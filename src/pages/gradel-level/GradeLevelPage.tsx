@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Fab, InputAdornment, TextField, Typography} from '@mui/material';
+import {Fab, Typography} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
-import {getGradeLevels, GradeLevel} from '../../api/gradeLevel';
+import {deleteGradeLevel, getGradeLevels, GradeLevel} from '../../api/gradeLevel';
 import {deleteStream, getStreams, Stream} from '../../api/stream';
-import GradeLevelTable from './GradeLevelTable';
-import StreamsDialog from './StreamsDialog';
+import PaginatedTable from '../../components/PaginatedTable';
 import GradeFormDialog from './GradeFormDialog';
+import StreamsDialog from './StreamsDialog';
 import StreamFormDialog from './StreamFormDialog';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import CustomSearchTextField from '../../components/CustomSearchTextField';
+import ActionsMenu from '../../components/ActionsMenu';
 
 const GradeLevelPage: React.FC = () => {
     const [gradeLevels, setGradeLevels] = useState<GradeLevel[]>([]);
@@ -22,7 +23,8 @@ const GradeLevelPage: React.FC = () => {
     const [showGradeForm, setShowGradeForm] = useState(false);
     const [showStreamsDialog, setShowStreamsDialog] = useState(false);
     const [showStreamForm, setShowStreamForm] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showGradeDeleteDialog, setShowGradeDeleteDialog] = useState(false);
+    const [showStreamDeleteDialog, setShowStreamDeleteDialog] = useState(false);
 
     // Load grade levels
     const loadGradeLevels = async () => {
@@ -54,39 +56,55 @@ const GradeLevelPage: React.FC = () => {
             </div>
 
             {/* Search Field */}
-            <TextField
+            <CustomSearchTextField
                 label="Search Grade Levels"
-                variant="outlined"
-                fullWidth
-                margin="normal"
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon/>
-                        </InputAdornment>
-                    ),
-                }}
+                onSearchChange={(value) => setFilter(value)}
             />
 
             {/* Grade Levels Table */}
-            <GradeLevelTable
-                gradeLevels={gradeLevels}
+            <PaginatedTable
+                data={gradeLevels}
                 totalItems={totalItems}
+                columns={[
+                    {
+                        key: 'name',
+                        label: 'Name',
+                        render: (grade: GradeLevel) => (
+                            <button
+                                className="text-blue-500 hover:underline"
+                                onClick={() => {
+                                    setSelectedGrade(grade);
+                                    loadStreams(grade.id);
+                                    setShowStreamsDialog(true);
+                                }}
+                            >
+                                {grade.name}
+                            </button>
+                        ),
+                    },
+                    {
+                        key: 'actions',
+                        label: 'Actions',
+                        render: (grade: GradeLevel) => (
+                            <ActionsMenu
+                                entity={grade}
+                                onEdit={(entity) => {
+                                    setSelectedGrade(entity);
+                                    setShowGradeForm(true);
+                                }}
+                                onDelete={(entity) => {
+                                    setSelectedGrade(entity);
+                                    setShowGradeDeleteDialog(true);
+                                }}
+                            />
+                        ),
+                    },
+                ]}
                 page={page}
                 rowsPerPage={rowsPerPage}
                 onPageChange={setPage}
                 onRowsPerPageChange={setRowsPerPage}
-                onEdit={(grade) => {
-                    setSelectedGrade(grade);
-                    setShowGradeForm(true);
-                }}
-                onViewStreams={(grade) => {
-                    setSelectedGrade(grade);
-                    loadStreams(grade.id);
-                    setShowStreamsDialog(true);
-                }}
             />
 
             {/* Modals */}
@@ -109,7 +127,7 @@ const GradeLevelPage: React.FC = () => {
                 }}
                 onDeleteStream={(stream) => {
                     setSelectedStream(stream);
-                    setShowDeleteDialog(true);
+                    setShowStreamDeleteDialog(true);
                 }}
             />
 
@@ -121,14 +139,29 @@ const GradeLevelPage: React.FC = () => {
                 reloadStreams={() => selectedGrade && loadStreams(selectedGrade.id)}
             />
 
+            {/* Delete Confirmation Dialog for Grade Levels */}
             <DeleteConfirmationDialog
-                open={showDeleteDialog}
-                onClose={() => setShowDeleteDialog(false)}
+                open={showGradeDeleteDialog}
+                onClose={() => setShowGradeDeleteDialog(false)}
+                onConfirm={async () => {
+                    if (selectedGrade) {
+                        await deleteGradeLevel(selectedGrade.id); // Call delete API for Grade Level
+                        await loadGradeLevels(); // Reload grade levels after deletion
+                        setShowGradeDeleteDialog(false);
+                    }
+                }}
+                entityName={selectedGrade?.name || 'Grade Level'}
+            />
+
+            {/* Delete Confirmation Dialog for Streams */}
+            <DeleteConfirmationDialog
+                open={showStreamDeleteDialog}
+                onClose={() => setShowStreamDeleteDialog(false)}
                 onConfirm={async () => {
                     if (selectedStream) {
-                        await deleteStream(selectedStream.id);
-                        if (selectedGrade) await loadStreams(selectedGrade.id);
-                        setShowDeleteDialog(false);
+                        await deleteStream(selectedStream.id); // Call delete API for Stream
+                        if (selectedGrade) await loadStreams(selectedGrade.id); // Reload streams after deletion
+                        setShowStreamDeleteDialog(false);
                     }
                 }}
                 entityName={selectedStream?.name || 'Stream'}
