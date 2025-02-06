@@ -25,6 +25,7 @@ const GradeFormDialog: React.FC<GradeFormDialogProps> = ({
         validationSchema: Yup.object({
             name: Yup.string().required('Grade name is required'),
         }),
+
         onSubmit: async (values) => {
             try {
                 if (selectedGrade?.id) {

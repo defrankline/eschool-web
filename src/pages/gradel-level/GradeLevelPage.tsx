@@ -30,6 +30,7 @@ const GradeLevelPage: React.FC = () => {
     const loadGradeLevels = async () => {
         const response = await getGradeLevels(page, rowsPerPage, filter);
         setGradeLevels(response.data);
+        setSelectedGrade(null);
         setTotalItems(response.totalItems);
     };
 
